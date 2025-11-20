@@ -1,0 +1,25 @@
+.form {
+  width: 100%;
+  max-width: 400px;
+
+  .submit-button {
+    width: 100%;
+    padding: 12px 16px;
+    background: #007bff;
+    color: var(--colorLight);
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    
+    &:hover:not(:disabled) {
+      background: #0056b3;
+    }
+    
+    &:disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+    }
+  }
+}
