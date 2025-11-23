@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Input from '../../Input/Input';
-import { validateEmail, validatePassword } from '../../../utils/validation';
+import { validatePassword, validateUsername } from '../../../utils/validation';
 import { type LoginData } from '../../../types/auth';
 import styles from './LoginForm.module.scss';
 
@@ -21,7 +21,7 @@ const LoginForm = ({ onSubmit, isLoading = false }: LoginFormProps) => {
   });
 
   const validateForm = (): boolean => {
-    const usernameError = validateEmail(formData.username);
+    const usernameError = validateUsername(formData.username);
     const passwordError = validatePassword(formData.password);
     
     setErrors({
@@ -62,7 +62,7 @@ const LoginForm = ({ onSubmit, isLoading = false }: LoginFormProps) => {
         type="text"
         value={formData.username}
         onChange={handleChange('username')}
-        placeholder="Username"
+        placeholder="Имя пользователя"
         error={errors.username}
         disabled={isLoading}
       />

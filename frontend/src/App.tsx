@@ -1,32 +1,52 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage/LoginPage';
 import RegisterPage from './pages/RegisterPage/RegisterPage';
+import { authService } from './utils/auth';
+import { AuthProvider } from './contexts/AuthContext';
+
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const token = authService.getAccessToken();
+  
+  return token ? <>{children}</> : <Navigate to="/login" replace />;
+};
+
+const PublicRoute = ({ children }: { children: React.ReactNode }) => {
+  const token = authService.getAccessToken();
+  
+  return !token ? <>{children}</> : <Navigate to="/" replace />;
+};
 
 const App = () => {
-  const isAuthenticated = false;
-
   return (
+      <AuthProvider>
         <Routes>
           <Route 
             path="/login" 
             element={
-              isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />
+              <PublicRoute>
+                <LoginPage />
+              </PublicRoute>
             } 
           />
           <Route 
             path="/register" 
             element={
-              isAuthenticated ? <Navigate to="/" replace /> : <RegisterPage />
+              <PublicRoute>
+                <RegisterPage />
+              </PublicRoute>
             } 
           />
           <Route 
             path="/" 
             element={
-              isAuthenticated ? <div>Мессенджер</div> : <Navigate to="/login" replace />
+              <ProtectedRoute>
+                <div>Мессенджер</div>
+              </ProtectedRoute>
             } 
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+      </AuthProvider>
   );
 };
 

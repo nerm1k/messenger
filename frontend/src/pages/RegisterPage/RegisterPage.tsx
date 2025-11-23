@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import RegisterForm from '../../components/Auth/RegisterForm/RegisterForm';
 import { type RegisterData } from '../../types/auth';
 import { apiService } from '../../api/api';
 import styles from './RegisterPage.module.scss';
+import { useAuth } from '../../contexts/AuthContext';
 
 const RegisterPage = () => {
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -14,9 +17,11 @@ const RegisterPage = () => {
     setError('');
     
     try {
-      const response = await apiService.register(registerData);
+      const { confirmPassword, ...dataToSend } = registerData;
+      const response = await apiService.register(dataToSend);
+      login(response);
       console.log('Registration successful:', response);
-      localStorage.setItem('token', response.token);
+      navigate('/')
     } catch (err) {
       setError('Ошибка регистрации. Возможно, пользователь уже существует.');
       console.error('Registration error:', err);
