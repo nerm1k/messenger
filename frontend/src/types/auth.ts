@@ -23,5 +23,26 @@ export interface AuthResponse {
     id: string;
     username: string;
     email: string;
+    avatar_url: string | null;
+    created_at: string;
+    is_online: boolean;
   };
+}
+
+export interface UserResponse {
+  id: string;
+  username: string;
+  email: string;
+  avatar_url: string | null;
+  created_at: string;
+  is_online: boolean;
+}
+
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+  avatar_url: string | null;
+  is_online: boolean;
+  created_at: string;
 }

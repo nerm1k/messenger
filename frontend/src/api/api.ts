@@ -1,4 +1,5 @@
-import { type LoginData, type RegisterData, type AuthResponse, type RegisterRequest } from '../types/auth';
+import { type LoginData, type RegisterData, type AuthResponse, type RegisterRequest, type UserResponse, type User } from '../types/auth';
+import type { DialogResponse, MessageResponse } from '../types/dialog';
 import { authService } from '../utils/auth';
 
 const API_BASE_URL = import.meta.env.BACKEND_API || 'http://localhost:8000/api/v1';
@@ -58,15 +59,15 @@ class ApiService {
   }
 
   async logout(): Promise<void> {
-    await this.request('/auth/logout', {
-      method: 'POST',
-    });
+    // await this.request('/auth/logout', {
+    //   method: 'POST',
+    // });
 
     authService.clearTokens();
   }
 
-  async getCurrentUser(): Promise<AuthResponse> {
-    return this.request<AuthResponse>('/auth/me');
+  async getCurrentUser(): Promise<UserResponse> {
+    return this.request<UserResponse>('/auth/me');
   } 
 
   async register(registerData: RegisterRequest): Promise<AuthResponse> {
@@ -80,6 +81,32 @@ class ApiService {
     }
     
     return response;
+  }
+
+  async createDialog(userId: number): Promise<{ dialog_id: number; existing: boolean }> {
+    return this.request<{ dialog_id: number; existing: boolean }>('/dialogs', {
+      method: 'POST',
+      body: JSON.stringify({ user_id: userId }),
+    });
+  }
+
+  async getMyDialogs(): Promise<DialogResponse[]> {
+    return this.request<DialogResponse[]>('/dialogs');
+  }
+
+  async searchUsers(query: string): Promise<User[]> {
+    return this.request<User[]>(`/users/search?username=${encodeURIComponent(query)}`);
+  }
+
+  async createChat(userId: number): Promise<{ chat_id: number; existing: boolean }> {
+    return this.request<{ chat_id: number; existing: boolean }>('/chats', {
+      method: 'POST',
+      body: JSON.stringify({ user_id: userId }),
+    });
+  }
+
+  async getDialogMessages(dialogId: number): Promise<MessageResponse[]> {
+    return this.request<MessageResponse[]>(`/dialogs/${dialogId}/messages`);
   }
 }
 

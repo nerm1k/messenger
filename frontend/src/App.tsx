@@ -3,6 +3,7 @@ import LoginPage from './pages/LoginPage/LoginPage';
 import RegisterPage from './pages/RegisterPage/RegisterPage';
 import { authService } from './utils/auth';
 import { AuthProvider } from './contexts/AuthContext';
+import MainPage from './pages/MainPage/MainPage';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const token = authService.getAccessToken();
@@ -40,7 +41,7 @@ const App = () => {
             path="/" 
             element={
               <ProtectedRoute>
-                <div>Мессенджер</div>
+               <MainPage />
               </ProtectedRoute>
             } 
           />

@@ -19,7 +19,7 @@ const LoginPage = () => {
     try {
       const response = await apiService.login(loginData);
       console.log('Login successful:', response);
-      login(response);
+      login(response.user);
       navigate('/');
     } catch (err) {
       setError('Ошибка входа. Проверьте логин и пароль.');
