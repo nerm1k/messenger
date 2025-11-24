@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from database.session import get_db
 from schemas.user import UserCreate, UserResponse, Token, UserLogin
 from crud.user import create_user, get_user_by_email_or_username, authenticate_user
-from core.security import create_access_token, create_refresh_token, verify_token, SECRET_KEY, ALGORITHM, verify_password, oauth2_scheme
+from core.security import create_access_token, create_refresh_token, verify_token, SECRET_KEY, ALGORITHM, verify_password, oauth2_scheme, get_current_user
 from jose import JWTError, jwt
 from models.user import User
 
@@ -94,30 +94,6 @@ def login(
             created_at=user.created_at
         )
     )
-
-def get_current_user(
-    token: str = Depends(oauth2_scheme), 
-    db: Session = Depends(get_db)
-):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: int = payload.get("user_id")
-        if user_id is None:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
-    
-    user = db.query(User).filter(User.id == user_id).first()
-    if user is None:
-        raise credentials_exception
-    
-    return user
 
 @router.get("/me", response_model=UserResponse)
 def get_current_user_info(current_user: User = Depends(get_current_user)):

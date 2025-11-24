@@ -1,5 +1,5 @@
-from fastapi import FastAPI
-from api import auth
+from fastapi import FastAPI, websockets
+from api import auth, dialogs, users, websocket
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Messenger API")
@@ -17,3 +17,6 @@ async def root():
     return {"message": "Hello World"}
 
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
+app.include_router(users.router, prefix="/api/v1/users", tags=["users"]) 
+app.include_router(dialogs.router, prefix="/api/v1/dialogs", tags=["dialogs"])
+app.include_router(websocket.router, prefix="/api/v1/websocket", tags=["websocket"])
