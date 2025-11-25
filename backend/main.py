@@ -1,12 +1,12 @@
 from fastapi import FastAPI, websockets
-from api import auth, dialogs, users, websocket
+from api import auth, dialogs, users, websocket, profile
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Messenger API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # URL твоего React приложения
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -20,3 +20,4 @@ app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
 app.include_router(users.router, prefix="/api/v1/users", tags=["users"]) 
 app.include_router(dialogs.router, prefix="/api/v1/dialogs", tags=["dialogs"])
 app.include_router(websocket.router, prefix="/api/v1/websocket", tags=["websocket"])
+app.include_router(profile.router, prefix="/api/v1/profile", tags=["profile"])

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, validator
 from datetime import datetime
 from typing import Optional
 
@@ -27,3 +27,24 @@ class Token(BaseModel):
 class UserLogin(BaseModel):
     username: str
     password: str
+
+class ProfileUpdate(BaseModel):
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+    current_password: Optional[str] = None
+    new_password: Optional[str] = None
+
+    @validator('username')
+    def validate_username(cls, v):
+        if v is not None and len(v) < 3:
+            raise ValueError('Username must be at least 3 characters long')
+        return v
+
+    @validator('new_password')
+    def validate_new_password(cls, v, values):
+        if v is not None:
+            if 'current_password' not in values or not values['current_password']:
+                raise ValueError('Current password is required to set new password')
+            if len(v) < 6:
+                raise ValueError('New password must be at least 6 characters long')
+        return v
