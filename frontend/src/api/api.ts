@@ -108,6 +108,22 @@ class ApiService {
   async getDialogMessages(dialogId: number): Promise<MessageResponse[]> {
     return this.request<MessageResponse[]>(`/dialogs/${dialogId}/messages`);
   }
+
+  async getProfile(): Promise<UserResponse> {
+    return this.request<UserResponse>('/profile');
+  }
+
+  async updateProfile(profileData: {
+    username: string;
+    email: string;
+    current_password?: string;
+    new_password?: string;
+  }): Promise<UserResponse> {
+    return this.request<UserResponse>('/profile', {
+      method: 'PUT',
+      body: JSON.stringify(profileData),
+    });
+  }
 }
 
 export const apiService = new ApiService();

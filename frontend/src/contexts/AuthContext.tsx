@@ -9,6 +9,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (userData: UserResponse) => void;
   logout: () => void;
+  updateUser: (userData: UserResponse) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -70,8 +71,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     websocketService.disconnect();
   };
 
+  const updateUser = (userData: UserResponse) => {
+    setUser(userData);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

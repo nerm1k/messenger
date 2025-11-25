@@ -4,6 +4,7 @@ import RegisterPage from './pages/RegisterPage/RegisterPage';
 import { authService } from './utils/auth';
 import { AuthProvider } from './contexts/AuthContext';
 import MainPage from './pages/MainPage/MainPage';
+import ProfilePage from './pages/ProfilePage/ProfilePage';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const token = authService.getAccessToken();
@@ -42,6 +43,14 @@ const App = () => {
             element={
               <ProtectedRoute>
                <MainPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
               </ProtectedRoute>
             } 
           />

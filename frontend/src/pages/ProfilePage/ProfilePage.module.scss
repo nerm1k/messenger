@@ -1,0 +1,182 @@
+.wide-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 20px;
+  background: #f8f9fa;
+}
+
+.container {
+  max-width: 500px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #3b82f6;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-right: 12px;
+  
+  &:hover {
+    background: #f3f4f6;
+  }
+}
+
+.header h1 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.avatarSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid #e5e7eb;
+}
+
+.changeAvatarButton {
+  background: #f8f9fa;
+  border: 1px solid #d1d5db;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #4b5563;
+  
+  &:hover {
+    background: #e5e7eb;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.successMessage {
+  background: #d1fae5;
+  color: #065f46;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid #a7f3d0;
+  font-size: 14px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 13px;
+}
+
+.passwordSection {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.passwordSection h3 {
+  margin: 0 0 6px 0;
+  color: #1f2937;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.passwordHint {
+  margin: 0 0 16px 0;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.cancelButton {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  
+  &:hover:not(:disabled) {
+    background: #e5e7eb;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.saveButton {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  
+  &:hover:not(:disabled) {
+    background: #2563eb;
+  }
+  
+  &:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+  }
+}
+
+.error {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 2px;
+}

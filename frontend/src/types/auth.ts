@@ -46,3 +46,11 @@ export interface User {
   is_online: boolean;
   created_at: string;
 }
+
+export interface ProfileData {
+  username: string;
+  email: string;
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
