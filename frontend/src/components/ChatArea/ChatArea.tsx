@@ -30,7 +30,8 @@ const ChatArea = ({ selectedChat }: ChatAreaProps) => {
   useEffect(() => {
     if (selectedChat) {
       loadMessages();
-      websocketService.markAsRead(selectedChat.id);
+    } else {
+      setMessages([]);
     }
   }, [selectedChat]);
 
@@ -39,18 +40,19 @@ const ChatArea = ({ selectedChat }: ChatAreaProps) => {
   }, [messages]);
 
   useEffect(() => {
+    if (!selectedChat) return;
+
+    let isCurrentChat = true;
+    const currentDialogId = selectedChat.id;
+
     const handleNewMessage = (data: any) => {
-      if (data.type === 'new_message' && data.message.dialog_id === selectedChat?.id) {
+      if (isCurrentChat && data.type === 'new_message' && data.message.dialog_id === currentDialogId) {
         setMessages(prev => [...prev, data.message]);
-        
-        if (data.message.sender_id !== user?.id && selectedChat) {
-          websocketService.markAsRead(selectedChat.id);
-        }
       }
     };
 
     const handleTyping = (data: any) => {
-      if (data.type === 'user_typing' && data.dialog_id === selectedChat?.id) {
+      if (isCurrentChat && data.type === 'user_typing' && data.dialog_id === currentDialogId) {
         setIsTyping(data.is_typing);
         setTypingUser(data.username);
         
@@ -64,8 +66,14 @@ const ChatArea = ({ selectedChat }: ChatAreaProps) => {
     };
 
     const handleMessagesRead = (data: any) => {
-      if (data.type === 'messages_read' && data.dialog_id === selectedChat?.id) {
-        console.log('Сообщения прочитаны пользователем:', data.reader_id);
+      if (isCurrentChat && data.type === 'messages_read' && data.dialog_id === currentDialogId) {
+        setMessages(prev => 
+          prev.map(message => 
+            message.sender_id === user?.id 
+              ? { ...message, is_read: true }
+              : message
+          )
+        );
       }
     };
 
@@ -74,6 +82,8 @@ const ChatArea = ({ selectedChat }: ChatAreaProps) => {
     websocketService.onMessage(handleMessagesRead);
 
     return () => {
+      isCurrentChat = false;
+      
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
       }
@@ -104,9 +114,7 @@ const ChatArea = ({ selectedChat }: ChatAreaProps) => {
     if (!newMessage.trim() || !selectedChat) return;
 
     websocketService.sendTextMessage(selectedChat.id, newMessage.trim());
-    
     setNewMessage('');
-    
     websocketService.sendTyping(selectedChat.id, false);
   };
 
@@ -130,6 +138,19 @@ const ChatArea = ({ selectedChat }: ChatAreaProps) => {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  const getMessageStatus = (message: MessageResponse) => {
+    if (message.sender_id !== user?.id) return null;
+    
+    const userMessages = messages.filter(m => m.sender_id === user?.id);
+    const lastUserMessage = userMessages[userMessages.length - 1];
+    
+    if (message.id === lastUserMessage?.id) {
+      return message.is_read ? '✓✓' : '✓';
+    }
+    
+    return message.is_read ? '✓✓' : '✓';
   };
 
   if (!selectedChat) {
@@ -187,7 +208,7 @@ const ChatArea = ({ selectedChat }: ChatAreaProps) => {
                     {formatTime(message.created_at)}
                     {message.sender_id === user?.id && (
                       <span className={styles.message__status}>
-                        {message.is_read ? '✓✓' : '✓'}
+                        {getMessageStatus(message)}
                       </span>
                     )}
                   </div>

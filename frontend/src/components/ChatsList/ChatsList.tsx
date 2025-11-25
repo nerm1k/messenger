@@ -6,6 +6,7 @@ interface Chat {
   avatar_url: string | null;
   lastMessage: string;
   unread: number;
+  updated_at: Date;
 }
 
 interface ChatsListProps {
@@ -15,11 +16,15 @@ interface ChatsListProps {
 }
 
 const ChatsList = ({ chats, selectedChat, onChatSelect }: ChatsListProps) => {
+  const sortedChats = [...chats].sort((a, b) => 
+    new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+  );
+  
   return (
     <div className={styles.container}>
       <h3 className={styles.container__title}>Чаты</h3>
       <div className={styles.chats}>
-        {chats.map(chat => (
+        {sortedChats.map(chat => (
           <div
             key={chat.id}
             className={`${styles['chats__item']} ${selectedChat?.id === chat.id ? styles.active : ''}`}

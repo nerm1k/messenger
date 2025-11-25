@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { apiService } from '../../api/api';
+import { websocketService } from '../../api/websocket';
 import { type DialogResponse } from '../../types/dialog';
 import { type User } from '../../types/auth';
 import ChatsList from '../ChatsList/ChatsList';
@@ -13,6 +14,7 @@ interface ChatItem {
   avatar_url: string | null;
   lastMessage: string;
   unread: number;
+  updated_at: Date;
 }
 
 const ChatLayout = () => {
@@ -26,7 +28,57 @@ const ChatLayout = () => {
 
   useEffect(() => {
     loadDialogs();
+    setupWebSocketListeners();
+    
+    return () => {
+      websocketService.disconnect();
+    };
   }, []);
+
+  const setupWebSocketListeners = () => {
+    websocketService.onMessage((data) => {
+      if (data.type === 'new_message') {
+        handleNewMessage(data.message);
+      } else if (data.type === 'messages_read') {
+        handleMessagesRead(data.dialog_id);
+      }
+    });
+  };
+
+  const handleNewMessage = (message: any) => {
+    setChats(prevChats => {
+      const chatIndex = prevChats.findIndex(chat => chat.id === message.dialog_id);
+      
+      if (chatIndex === -1) {
+        if (message.sender_id !== user?.id) {
+          loadDialogs();
+        }
+        return prevChats;
+      }
+
+      const updatedChats = [...prevChats];
+      const chat = updatedChats[chatIndex];
+      
+      const shouldIncrementUnread = message.sender_id !== user?.id && selectedChat?.id !== message.dialog_id;
+      
+      updatedChats[chatIndex] = {
+        ...chat,
+        lastMessage: message.content,
+        updated_at: new Date(),
+        unread: shouldIncrementUnread ? chat.unread + 1 : chat.unread
+      };
+
+      return updatedChats.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+    });
+  };
+
+  const handleMessagesRead = (dialogId: number) => {
+    setChats(prevChats => 
+      prevChats.map(chat => 
+        chat.id === dialogId ? { ...chat, unread: 0 } : chat
+      )
+    );
+  };
 
   const loadDialogs = async () => {
     try {
@@ -38,14 +90,33 @@ const ChatLayout = () => {
         username: dialog.other_user.username,
         avatar_url: dialog.other_user.avatar_url,
         lastMessage: dialog.last_message?.content || 'Диалог создан',
-        unread: dialog.unread_count
+        unread: dialog.unread_count,
+        updated_at: new Date(dialog.updated_at)
       }));
       
-      setChats(chatItems);
+      const sortedChats = chatItems.sort((a, b) => 
+        new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+      );
+      
+      setChats(sortedChats);
     } catch (error) {
       console.error('Error loading dialogs:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleChatSelect = (chat: ChatItem) => {
+    setSelectedChat(chat);
+    
+    if (chat.unread > 0) {
+      setChats(prevChats => 
+        prevChats.map(c => 
+          c.id === chat.id ? { ...c, unread: 0 } : c
+        )
+      );
+      
+      websocketService.markAsRead(chat.id);
     }
   };
 
@@ -77,12 +148,6 @@ const ChatLayout = () => {
       await loadDialogs();
       setSearchQuery('');
       setSearchResults([]);
-      
-      if (result.existing) {
-        console.log('Диалог уже существовал');
-      } else {
-        console.log('Новый диалог создан');
-      }
     } catch (error) {
       console.error('Create dialog error:', error);
       alert('Ошибка при создании диалога');
@@ -150,7 +215,7 @@ const ChatLayout = () => {
           <ChatsList 
             chats={chats} 
             selectedChat={selectedChat}
-            onChatSelect={setSelectedChat}
+            onChatSelect={handleChatSelect}
           />
         )}
       </div>

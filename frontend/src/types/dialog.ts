@@ -5,7 +5,7 @@ export interface DialogResponse {
   user1_id: number;
   user2_id: number;
   created_at: string;
-  updated_at: string;
+  updated_at: Date;
   other_user: UserResponse;
   last_message?: MessageResponse;
   unread_count: number;

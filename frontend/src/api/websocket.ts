@@ -11,6 +11,7 @@ class WebSocketService {
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
   private connectionPromise: Promise<void> | null = null;
+  private chatUpdateHandlers: ((message: any) => void)[] = [];
 
    async connect(token: string): Promise<void> {
     if (this.connectionPromise) {
@@ -84,9 +85,20 @@ class WebSocketService {
     this.messageHandlers.push(handler);
   }
 
+  offMessage(handler: (data: any) => void) {
+    const index = this.messageHandlers.indexOf(handler);
+    if (index > -1) {
+      this.messageHandlers.splice(index, 1);
+    }
+  }
+
   private handleMessage(data: any) {
     this.messageHandlers.forEach(handler => handler(data));
   }
+
+  // private handleMessage(data: any) {
+  //   this.messageHandlers.forEach(handler => handler(data));
+  // }
 
   disconnect() {
     if (this.socket) {
@@ -118,6 +130,22 @@ class WebSocketService {
       dialog_id: dialogId
     });
   }
+
+  onChatUpdate(handler: (message: any) => void) {
+    this.chatUpdateHandlers.push(handler);
+  }
+
+  private handleChatUpdate(message: any) {
+    this.chatUpdateHandlers.forEach(handler => handler(message));
+  }
+
+  // private handleMessage(data: any) {
+  //   this.messageHandlers.forEach(handler => handler(data));
+
+  //   if (data.type === 'new_message') {
+  //     this.handleChatUpdate(data.message);
+  //   }
+  // }
 }
 
 export const websocketService = new WebSocketService();
